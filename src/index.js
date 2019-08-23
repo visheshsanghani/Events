@@ -1,19 +1,29 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {BrowserRouter} from 'react-router-dom';
+import {configStore} from './app/store/configStore';
+import {Provider} from 'react-redux';
 
 import './index.css';
 
 import App from './app/layout/App';
 import * as serviceWorker from './serviceWorker';
+import ScrollToTop from './app/common/util/ScrollToTop';
+
+const store = configStore();
+
 
 const rootEL = document.getElementById("root");
 
 let render = () =>{
     ReactDOM.render(
+    <Provider store = {store}>
     <BrowserRouter>
+    <ScrollToTop>
     <App />
+    </ScrollToTop>
     </BrowserRouter>
+    </Provider>
     , rootEL);
 }
 

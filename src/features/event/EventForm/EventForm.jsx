@@ -1,14 +1,11 @@
 import React, { Component } from 'react'
 import { Segment, Form, Button } from 'semantic-ui-react';
+import {connect} from 'react-redux';
+import {createEvent , updateEvent } from '../eventActions';
+import cuid from 'cuid';
 
 class EventForm extends Component {
-  state ={
-    title : '',
-    date :'',
-    city:'',
-    venue : '',
-    hostedBy: ''
-  };  
+  state = {...this.props.event};  
 
   componentDidMount(){
     this.setState({
@@ -20,11 +17,18 @@ class EventForm extends Component {
   {
     evt.preventDefault();
     if(this.state.id){
-      this.props.updatedEvent(this.state);
+      this.props.updateEvent(this.state);
+      this.props.history.push(`/events/${this.state.id}`);  
     }
     else{
-    this.props.createEvent(this.state);
+    let newEvent = {
+      ...this.state
+     , id : cuid(),
+     hostPhotoURL : "/assets/user.png"
     }
+    this.props.createEvent(newEvent);
+    this.props.history.push(`/events/${newEvent.id}`);  
+  }
   }
 
   handleInputChange = (evt) =>
@@ -85,11 +89,36 @@ class EventForm extends Component {
                       <Button positive type="submit">
                         Submit
                       </Button>
-                      <Button onClick = {this.props.cancelFormOpen} type="button">Cancel</Button>
+                      <Button onClick = {this.props.history.goBack} type="button">Cancel</Button>
                     </Form>
                   </Segment>
         )
     }
 }
 
-export default EventForm;
+const mapStateToProps = (state , OwnProps) =>{
+  const eventId = OwnProps.match.params.id;
+
+  let event = {
+    title : '',
+    date :'',
+    city:'',
+    venue : '',
+    hostedBy: ''
+  }
+
+  if (eventId && state.events.length > 0){
+    event = state.events.filter(event => event.id === eventId)[0]
+  }
+
+  return {
+    event : event
+  }
+}
+
+const dispatchStateToProps = {
+  createEvent : createEvent,
+  updateEvent : updateEvent
+}
+
+export default connect(mapStateToProps , dispatchStateToProps)(EventForm);

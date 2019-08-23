@@ -1,122 +1,14 @@
 import React, { Component } from 'react';
-import {Grid, Button } from 'semantic-ui-react';
-import cuid from "cuid";
+import {Grid } from 'semantic-ui-react';
+import {connect} from 'react-redux';
 
-import EventList from '../EventList/EventList';
-import EventForm from '../EventForm/EventForm';
-
-
-const eventsFromDashBoard = [
-  {
-    id: '1',
-    title: 'Trip to Tower of London',
-    date: '2018-03-27',
-    category: 'culture',
-    description:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus sollicitudin ligula eu leo tincidunt, quis scelerisque magna dapibus. Sed eget ipsum vel arcu vehicula ullamcorper.',
-    city: 'London, UK',
-    venue: "Tower of London, St Katharine's & Wapping, London",
-    hostedBy: 'Bob',
-    hostPhotoURL: 'https://randomuser.me/api/portraits/men/20.jpg',
-    attendees: [
-      {
-        id: 'a',
-        name: 'Bob',
-        photoURL: 'https://randomuser.me/api/portraits/men/20.jpg'
-      },
-      {
-        id: 'b',
-        name: 'Tom',
-        photoURL: 'https://randomuser.me/api/portraits/men/22.jpg'
-      }
-    ]
-  },
-  {
-    id: '2',
-    title: 'Trip to Punch and Judy Pub',
-    date: '2018-03-28',
-    category: 'drinks',
-    description:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus sollicitudin ligula eu leo tincidunt, quis scelerisque magna dapibus. Sed eget ipsum vel arcu vehicula ullamcorper.',
-    city: 'London, UK',
-    venue: 'Punch & Judy, Henrietta Street, London, UK',
-    hostedBy: 'Tom',
-    hostPhotoURL: 'https://randomuser.me/api/portraits/men/22.jpg',
-    attendees: [
-      {
-        id: 'b',
-        name: 'Tom',
-        photoURL: 'https://randomuser.me/api/portraits/men/22.jpg'
-      },
-      {
-        id: 'a',
-        name: 'Bob',
-        photoURL: 'https://randomuser.me/api/portraits/men/20.jpg'
-      }
-    ]
-  }
-]
-
+import EventList from "../EventList/EventList";
+import {createEvent , updateEvent , deleteEvent } from '../eventActions';
 
 class EventDashboard extends Component {
-  state = {
-    events : eventsFromDashBoard,
-    isOpen : false,
-    selectedEvent : null
-  }
-
-  // handleIsOpenToggle = () =>{
-  //   this.setState((prevState) =>({
-  //     isOpen : !prevState.isOpen
-  //   }))
-  // }
-
-  handleCreateFormOpen = () =>{
-    this.setState({
-      isOpen : true,
-      selectedEvent : null
-    })
-  }
-
-  handleFormCancel = () =>{
-    this.setState({
-      isOpen : false
-    })
-  }
-
-  handleCreateEvent = (newEvent) =>{
-    newEvent.id = cuid();
-    newEvent.hostPhotoURL = "/assets/user.png";
-    this.setState((prevState)=>({
-      events : [...prevState.events,newEvent],
-      isOpen : false 
-    })) 
-  }
-
-  handleSelectEvent = (event) =>{
-    this.setState({
-      selectedEvent : event,
-      isOpen : true
-    })
-  }
-
-  handleUpdateEvent = (updatedEvent) =>{
-    this.setState((prevState)=>({
-      events : prevState.events.map(event =>{
-        if(event.id === updatedEvent.id){
-          return {...updatedEvent}
-        }
-        else{
-          return event
-        }
-      })
-    }))
-  }
 
   handleDeleteEvent = (id) =>{
-    this.setState((prevState)=>({
-      events : prevState.events.filter(e => id !== e.id)
-    }))
+    this.props.deleteEvent(id);
   }
 
     render() {
@@ -125,26 +17,26 @@ class EventDashboard extends Component {
                 <Grid.Column width={10}>
                     <h2>
                        <EventList
-                        events = {this.state.events} 
-                        selectEvent = {this.handleSelectEvent}
+                        events = {this.props.events} 
                         deleteEvent = {this.handleDeleteEvent} />
                     </h2>
                 </Grid.Column>
                 <Grid.Column width={6}>
-                        <Button positive 
-                        onClick = {this.handleCreateFormOpen} 
-                        content="Create Event" />
-                        {this.state.isOpen && 
-                        <EventForm 
-                        key = {this.state.selectedEvent ? this.state.selectedEvent.id : 0}
-                        updatedEvent = {this.handleUpdateEvent}
-                        selectEvent = {this.state.selectedEvent}
-                        createEvent = {this.handleCreateEvent} 
-                        cancelFormOpen = {this.handleFormCancel} />}
+                  <h2>Activity Field</h2>
                 </Grid.Column>
             </Grid>
         )
     }
 }
 
-export default EventDashboard;
+const mapStateToProps = (state) =>({
+  events : state.events
+})
+
+const dispatchStateToProps = {
+  createEvent : createEvent,
+  updateEvent : updateEvent,
+  deleteEvent : deleteEvent
+}
+
+export default connect(mapStateToProps,dispatchStateToProps)(EventDashboard);

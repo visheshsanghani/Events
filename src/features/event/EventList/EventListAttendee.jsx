@@ -5,7 +5,7 @@ class EventListAttendee extends Component {
     render() {
         return (
             <List.Item>
-                <Image as = "A" size = "mini" circular src={this.props.attendee.photoURL} />
+                <Image size = "mini" circular src={this.props.attendee.photoURL} />
             </List.Item>
         )
     }
