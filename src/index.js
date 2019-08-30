@@ -4,13 +4,15 @@ import {BrowserRouter} from 'react-router-dom';
 import {configStore} from './app/store/configStore';
 import {Provider} from 'react-redux';
 
-import './index.css';
-
 import App from './app/layout/App';
 import * as serviceWorker from './serviceWorker';
 import ScrollToTop from './app/common/util/ScrollToTop';
+import { loadEvents } from './features/event/eventActions';
+
+import './index.css';
 
 const store = configStore();
+store.dispatch(loadEvents())
 
 
 const rootEL = document.getElementById("root");
